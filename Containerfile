@@ -1,3 +1,9 @@
+FROM scratch AS ctx
+
+COPY build_files /build
+COPY system_files /files
+COPY cosign.pub /files/etc/pki/containers/zirconium.pub
+
 FROM docker.io/archlinux/archlinux:latest AS builder
 
 ENV DEV_DEPS="base-devel git rust"
@@ -41,7 +47,7 @@ RUN sed -i 's/#Color/Color/g' /etc/pacman.conf && \
     useradd -m --shell=/bin/bash build && usermod -L build && \
     echo "build ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
     echo "root ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers && \
-    pacman -S --clean --clean
+    pacman -Scc --noconfirm
 
 # Add paru and install AUR packages
 USER build
@@ -54,21 +60,47 @@ RUN git clone https://aur.archlinux.org/paru-bin.git --single-branch && \
 #    paru -S \
 #        aur/placeholder \
 #        --noconfirm
+
+RUN paru -S \
+        aur/steam-devices-git \
+        aur/uxplay \
+        aur/niri-git \
+        aur/dms-shell-niri \
+        aur/matugen-bin \
+        aur/input-remapper-bin \
+        --noconfirm
+
 USER root
 WORKDIR /
 
 # Cleanup
-RUN sed -i 's@#en_US.UTF-8@en_US.UTF-8@g' /etc/locale.gen && \
-    userdel -r build && \
-    rm -drf /home/build && \
-    sed -i '/build ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
-    sed -i '/root ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
-    rm -rf /tmp/*
+#RUN sed -i 's@#en_US.UTF-8@en_US.UTF-8@g' /etc/locale.gen && \
+#    userdel -r build && \
+#    rm -drf /home/build && \
+#    sed -i '/build ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
+#    sed -i '/root ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
+#    rm -rf /tmp/*
+
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build/00-base.sh
+
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build/01-theme.sh
+
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build/02-extras.sh
+
+RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
+    --mount=type=tmpfs,dst=/tmp \
+    /ctx/build/99-cleanup.sh
 
 # END ############################################################################################################################################
 
 # Setup a temporary root passwd (changeme) for dev purposes
-# RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
+RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 
 #RUN pacman -Rns --noconfirm ${DEV_DEPS}
 

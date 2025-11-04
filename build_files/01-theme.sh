@@ -4,87 +4,71 @@ set -xeuo pipefail
 
 install -d /usr/share/zirconium/
 
-dnf -y copr enable yalter/niri-git
-dnf -y copr disable yalter/niri-git
-echo "priority=1" | tee -a /etc/yum.repos.d/_copr:copr.fedorainfracloud.org:yalter:niri-git.repo
-dnf -y --enablerepo copr:copr.fedorainfracloud.org:yalter:niri-git install niri
+
 rm -rf /usr/share/doc/niri
 
-dnf -y copr enable avengemedia/danklinux
-dnf -y copr disable avengemedia/danklinux
-dnf -y --enablerepo copr:copr.fedorainfracloud.org:avengemedia:danklinux install quickshell-git
-
-dnf -y copr enable avengemedia/dms-git
-dnf -y copr disable avengemedia/dms-git
-dnf -y \
-    --enablerepo copr:copr.fedorainfracloud.org:avengemedia:dms-git \
-    --enablerepo copr:copr.fedorainfracloud.org:avengemedia:danklinux \
-    install --setopt=install_weak_deps=False \
-    dms \
-    dms-cli \
-    dms-greeter \
-    dgop
-
-dnf -y copr enable scottames/ghostty
-dnf -y copr disable scottames/ghostty
-dnf -y --enablerepo copr:copr.fedorainfracloud.org:scottames:ghostty install ghostty
-
-dnf -y copr enable zirconium/packages
-dnf -y copr disable zirconium/packages
-dnf -y --enablerepo copr:copr.fedorainfracloud.org:zirconium:packages install \
-    matugen \
-    cliphist
-
-dnf -y remove alacritty
-dnf -y install \
-    brightnessctl \
-    cava \
-    chezmoi \
-    ddcutil \
-    fastfetch \
-    flatpak \
-    fpaste \
-    fzf \
-    git-core \
-    glycin-thumbnailer \
-    gnome-keyring \
-    greetd \
-    greetd-selinux \
-    input-remapper \
-    just \
-    nautilus \
-    orca \
-    pipewire \
-    steam-devices \
-    tuigreet \
-    udiskie \
-    webp-pixbuf-loader \
-    wireplumber \
-    wl-clipboard \
-    wlsunset \
-    xdg-desktop-portal-gnome \
-    xdg-user-dirs \
-    xwayland-satellite
 rm -rf /usr/share/doc/just
 
+pacman -Syyuu --noconfirm \
+	ghostty \
+	cliphist && \
+pacman -S --clean && \
+rm -rf /var/cache/pacman/pkg/*
 
-dnf install -y --setopt=install_weak_deps=False \
-    kf6-kirigami \
-    qt6ct \
-    polkit-kde \
-    plasma-breeze \
-    kf6-qqc2-desktop-style
+pacman -Syyuu --noconfirm \
+	brightnessctl \
+	cava \
+	chezmoi \
+	ddcutil \
+	fastfetch \
+	flatpak \
+	fzf \
+	git \
+	ffmpeg-thumbnail \
+	tumbler \
+	gnome-keyring \
+	greetd \
+	just \
+	nautilus \
+	orca \
+	pipewire \
+	udiskie \
+	webp-pixbuf-loader \
+	wireplumber \
+	wl-clipboard \
+	wlsunset \
+	xdg-desktop-portal-gnome \
+	xwayland-satellite \
+	docker \
+	docker-compose && \
+pacman -S --clean && \
+rm -rf /var/cache/pacman/pkg/*
 
+pacman -Syyuu --noconfirm \
+	kirigami \
+	qt6ct \
+	polkit-kde-agent \
+	breeze \
+	qqc2-desktop-style && \
+pacman -S --clean && \
+rm -rf /var/cache/pacman/pkg/*
+
+touch /etc/pam.d/greetd
 sed -i '/gnome_keyring.so/ s/-auth/auth/ ; /gnome_keyring.so/ s/-session/session/' /etc/pam.d/greetd
 cat /etc/pam.d/greetd
 
 sed -i "s/After=.*/After=graphical-session.target/" /usr/lib/systemd/user/plasma-polkit-agent.service
 
-# Codecs for video thumbnails on nautilus
-dnf config-manager addrepo --from-repofile=https://negativo17.org/repos/fedora-multimedia.repo
-dnf config-manager setopt fedora-multimedia.enabled=0
-dnf -y install --enablerepo=fedora-multimedia \
-    ffmpeg libavcodec @multimedia gstreamer1-plugins-{bad-free,bad-free-libs,good,base} lame{,-libs} libjxl ffmpegthumbnailer
+pacman -Syyuu --noconfirm \
+	ffmpeg \
+	libva \
+	libva-utils \
+	gstreamer \
+	lame \
+	libjxl && \
+pacman -S --clean && \
+rm -rf /var/cache/pacman/pkg/*
+
 
 add_wants_niri() {
     sed -i "s/\[Unit\]/\[Unit\]\nWants=$1/" "/usr/lib/systemd/user/niri.service"
@@ -100,12 +84,15 @@ systemctl enable greetd
 systemctl enable firewalld
 
 # Sacrificed to the :steamhappy: emoji old god
-dnf install -y \
-    default-fonts-core-emoji \
-    google-noto-color-emoji-fonts \
-    google-noto-emoji-fonts \
-    glibc-all-langpacks \
-    default-fonts
+pacman -Syyuu --noconfirm \
+	noto-fonts \
+	noto-fonts-emoji \
+	noto-fonts-cjk \
+	adwaita-fonts \
+	opendesktop-fonts \
+	gnu-free-fonts && \
+pacman -S --clean && \
+rm -rf /var/cache/pacman/pkg/*
 
 cp -avf "/ctx/files"/. /
 

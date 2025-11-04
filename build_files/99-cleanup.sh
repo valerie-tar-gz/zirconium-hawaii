@@ -23,12 +23,12 @@ s|^DEFAULT_HOSTNAME=.*|DEFAULT_HOSTNAME="zirconium"|
 EOF
 
 # Add Flathub to the image for eventual application
-mkdir -p /etc/flatpak/remotes.d/
-curl --retry 3 -Lo /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub.org/repo/flathub.flatpakrepo
+#mkdir -p /etc/flatpak/remotes.d/
+#curl --retry 3 -Lo /etc/flatpak/remotes.d/flathub.flatpakrepo https://dl.flathub.org/repo/flathub.flatpakrepo
 
 # GO AWAY fedora flatpaks.
-rm -rf /usr/lib/systemd/system/flatpak-add-fedora-repos.service
-systemctl enable flatpak-add-flathub-repos.service
+#rm -rf /usr/lib/systemd/system/flatpak-add-fedora-repos.service
+#systemctl enable flatpak-add-flathub-repos.service
 
 
 KERNEL_VERSION="$(find "/usr/lib/modules" -maxdepth 1 -type d ! -path "/usr/lib/modules" -exec basename '{}' ';' | sort | tail -n 1)"
