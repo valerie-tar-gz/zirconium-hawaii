@@ -1,0 +1,7 @@
+enable dms.service
+enable cliphist.service
+enable xwayland-satellite.service
+enable chezmoi-init.service
+enable chezmoi-update.timer
+enable plasma-polkit-agent.service
+enable app-com.mitchellh.ghostty.service

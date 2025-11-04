@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+TARGET_ZIRCONIUM_MOTD_CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}/zirconium/no-show-user-motd"
+if test ! -e "$TARGET_ZIRCONIUM_MOTD_CONFIG"; then
+  reset=$'\e[0m'
+  # bold=$'\e[1m'
+  # link=$'\e[38;2;23;118;122m'
+  slight_red=$'\e[48;2;48;48;48m\e[38;2;245;86;71m'
+  header=$'\e[1;38;5;228m\e[48;5;63m'
+  # PLEASE make sure this is properly organized, i dont want to include glow on the image :steamsad:
+  cat <<EOF
+
+  ${header} Welcome to Zirconium! ${reset}
+
+     Command                          │ Description
+  ─────────────────────────────────────┼────────────────────────────────────
+    ${slight_red} zjust toggle-user-motd ${reset}           │ Toggle this banner on/off
+    ${slight_red} zjust zdots-update ${reset}               │ Update your unmodified dotfiles
+    ${slight_red} zjust update-greeter ${reset}             │ Update your greeter with modifications from your current user
+
+    We've updated Zirconium to use Dank Material Shell instead of Noctalia, please run
+    ${slight_red} zjust reset-niri ${reset} to migrate your keybindings to it (NOTE: THIS WILL RESET ALL YOUR CONFIGS FOR NIRI)
+    You can keep using noctalia by running that, then running ${slight_red} zjust switch-to-noctalia ${reset}
+
+EOF
+fi
