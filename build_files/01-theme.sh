@@ -17,6 +17,7 @@ rm -rf /var/cache/pacman/pkg/*
 
 pacman -Syyuu --noconfirm \
 	brightnessctl \
+	jq \
 	cava \
 	chezmoi \
 	ddcutil \
@@ -26,8 +27,6 @@ pacman -Syyuu --noconfirm \
 	git \
 	ffmpeg-thumbnail \
 	tumbler \
-	gnome-keyring \
-	greetd \
 	just \
 	nautilus \
 	orca \
@@ -39,8 +38,14 @@ pacman -Syyuu --noconfirm \
 	wlsunset \
 	xdg-desktop-portal-gnome \
 	xwayland-satellite \
+	gnome-keyring \
 	docker \
 	docker-compose && \
+pacman -S --clean && \
+rm -rf /var/cache/pacman/pkg/*
+
+#Reinstalling packages that cause issues with their services, idk firewalld gnome-keyring
+pacman -Syyuu --noconfirm --overwrite greetd && \
 pacman -S --clean && \
 rm -rf /var/cache/pacman/pkg/*
 
@@ -102,7 +107,7 @@ systemctl enable --global app-com.mitchellh.ghostty.service
 systemctl enable --global chezmoi-update.timer
 systemctl enable --global dms.service
 systemctl enable --global cliphist.service
-systemctl enable --global gnome-keyring-daemon.socket
+#systemctl enable --global gnome-keyring-daemon.socket
 systemctl enable --global gnome-keyring-daemon.service
 systemctl enable --global plasma-polkit-agent.service
 systemctl enable --global swayidle.service
