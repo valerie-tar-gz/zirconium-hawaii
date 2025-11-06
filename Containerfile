@@ -4,36 +4,13 @@ COPY build_files /build
 COPY system_files /files
 COPY cosign.pub /files/etc/pki/containers/zirconium.pub
 
-FROM docker.io/archlinux/archlinux:latest AS builder
+FROM ghcr.io/bootcrew/arch-bootc
 
 ENV DEV_DEPS="base-devel git rust"
 
-ENV DRACUT_NO_XATTR=1
-RUN pacman -Syyuu --noconfirm \
-      base \
-      dracut \
-      linux \
-      linux-firmware \
-      ostree \
-      systemd \
-      btrfs-progs \
-      e2fsprogs \
-      xfsprogs \
-      dosfstools \
-      skopeo \
-      dbus \
-      dbus-glib \
-      glib2 \
-      ostree \
-      shadow \
-      ${DEV_DEPS} && \
-  pacman -S --clean && \
-  rm -rf /var/cache/pacman/pkg/*
-
-RUN --mount=type=tmpfs,dst=/tmp --mount=type=tmpfs,dst=/root \
-    git clone https://github.com/bootc-dev/bootc.git /tmp/bootc && \
-    cd /tmp/bootc && \
-    make bin install-all install-initramfs-dracut
+RUN pacman -Syyuu --noconfirm ${DEV_DEPS} && \
+	pacman -S --clean && \
+	rm -rf /var/cache/pacman/pkg/*
 
 # START ##########################################################################################################################################
 
@@ -57,15 +34,12 @@ RUN git clone https://aur.archlinux.org/paru-bin.git --single-branch && \
     makepkg -si --noconfirm && \
     cd .. && \
     rm -drf paru-bin
-#    paru -S \
-#        aur/placeholder \
-#        --noconfirm
 
 RUN paru -S \
         aur/steam-devices-git \
         aur/uxplay \
         aur/niri-git \
-        aur/dms-shell-niri \
+        aur/dms-shell-git \
         aur/matugen-bin \
         aur/input-remapper-bin \
         --noconfirm
@@ -74,12 +48,12 @@ USER root
 WORKDIR /
 
 # Cleanup
-#RUN sed -i 's@#en_US.UTF-8@en_US.UTF-8@g' /etc/locale.gen && \
-#    userdel -r build && \
-#    rm -drf /home/build && \
-#    sed -i '/build ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
-#    sed -i '/root ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
-#    rm -rf /tmp/*
+RUN sed -i 's@#en_US.UTF-8@en_US.UTF-8@g' /etc/locale.gen && \
+    userdel -r build && \
+    rm -drf /home/build && \
+    sed -i '/build ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
+    sed -i '/root ALL=(ALL) NOPASSWD: ALL/d' /etc/sudoers && \
+    rm -rf /tmp/*
 
 RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=tmpfs,dst=/tmp \
@@ -107,7 +81,7 @@ RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
 RUN sh -c 'export KERNEL_VERSION="$(basename "$(find /usr/lib/modules -maxdepth 1 -type d | grep -v -E "*.img" | tail -n 1)")" && \
     dracut --force --no-hostonly --reproducible --zstd --verbose --kver "$KERNEL_VERSION"  "/usr/lib/modules/$KERNEL_VERSION/initramfs.img"'
 
-RUN rm -rf /var /boot /home /root /usr/local /srv && \
+RUN rm -rf /var /boot /home /root /usr/local /srv /ostree && \
     mkdir -p /var /boot /sysroot && \
     ln -s /var/home /home && \
     ln -s /var/roothome /root && \

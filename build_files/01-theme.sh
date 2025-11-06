@@ -25,7 +25,7 @@ pacman -Syyuu --noconfirm \
 	flatpak \
 	fzf \
 	git \
-	ffmpeg-thumbnail \
+	ffmpegthumbnailer \
 	tumbler \
 	just \
 	nautilus \
@@ -39,13 +39,12 @@ pacman -Syyuu --noconfirm \
 	xdg-desktop-portal-gnome \
 	xwayland-satellite \
 	gnome-keyring \
+	greetd \
+	firewalld \
+	jq \
+	unzip \
 	docker \
 	docker-compose && \
-pacman -S --clean && \
-rm -rf /var/cache/pacman/pkg/*
-
-#Reinstalling packages that cause issues with their services, idk firewalld gnome-keyring
-pacman -Syyuu --noconfirm --overwrite greetd && \
 pacman -S --clean && \
 rm -rf /var/cache/pacman/pkg/*
 
@@ -85,6 +84,10 @@ add_wants_niri udiskie.service
 add_wants_niri xwayland-satellite.service
 cat /usr/lib/systemd/user/niri.service
 
+pacman -Syyuu --noconfirm greetd firewalld gnome-keyring jq unzip && \
+pacman -S --clean && \
+rm -rf /var/cache/pacman/pkg/*
+
 systemctl enable greetd
 systemctl enable firewalld
 
@@ -107,7 +110,7 @@ systemctl enable --global app-com.mitchellh.ghostty.service
 systemctl enable --global chezmoi-update.timer
 systemctl enable --global dms.service
 systemctl enable --global cliphist.service
-#systemctl enable --global gnome-keyring-daemon.socket
+systemctl enable --global gnome-keyring-daemon.socket
 systemctl enable --global gnome-keyring-daemon.service
 systemctl enable --global plasma-polkit-agent.service
 systemctl enable --global swayidle.service

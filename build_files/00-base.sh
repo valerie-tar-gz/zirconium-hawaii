@@ -41,7 +41,7 @@ pacman -Syyuu --noconfirm \
 	fuse2 \
 	fuse3 \
 	fuse-common \
-	fwup  \
+	fwupd  \
 	gvfs-smb \
 	ifuse \
 	libcamera \
