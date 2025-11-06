@@ -55,6 +55,9 @@ pacman -Syyuu --noconfirm \
 	tuned \
 	tuned-ppd \
 	unzip \
+	vim \
+	nano \
+	micro \
 	whois && \
 pacman -S --clean && \
 rm -rf /var/cache/pacman/pkg/*
