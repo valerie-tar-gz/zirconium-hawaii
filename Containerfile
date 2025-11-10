@@ -4,7 +4,7 @@ COPY build_files /build
 COPY system_files /files
 COPY cosign.pub /files/etc/pki/containers/zirconium.pub
 
-FROM ghcr.io/bootcrew/arch-bootc
+FROM ghcr.io/valerie-tar-gz/cachyos-bootc
 
 ENV DEV_DEPS="base-devel git rust"
 
