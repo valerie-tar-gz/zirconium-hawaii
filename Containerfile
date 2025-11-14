@@ -76,6 +76,7 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
 
 # Setup a temporary root passwd (changeme) for dev purposes
 RUN usermod -p "$(echo "changeme" | mkpasswd -s)" root
+RUN sudo useradd -M -G video greetd
 
 #RUN pacman -Rns --noconfirm ${DEV_DEPS}
 
